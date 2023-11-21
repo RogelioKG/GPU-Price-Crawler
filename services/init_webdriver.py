@@ -1,6 +1,11 @@
+# third party library
 from selenium import webdriver
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.microsoft import IEDriverManager
 
 
 def get_driver(browser: str, options: Options = Options()):
@@ -17,22 +22,22 @@ def get_driver(browser: str, options: Options = Options()):
     + `driver` (WebDriver) : WebDriver 實例
     """
     if browser == "Chrome":
-        from webdriver_manager.chrome import ChromeDriverManager
+        
         driver_path = ChromeDriverManager().install()
         driver = webdriver.Chrome(service=Service(driver_path), options=options)
 
     elif browser == "Edge":
-        from webdriver_manager.microsoft import EdgeChromiumDriverManager
+        
         driver_path = EdgeChromiumDriverManager().install()
         driver = webdriver.Edge(service=Service(driver_path), options=options)
 
     elif browser == "Firefox":
-        from webdriver_manager.firefox import GeckoDriverManager
+        
         driver_path = GeckoDriverManager().install()
         driver = webdriver.Firefox(service=Service(driver_path), options=options)
 
     elif browser == "IE":
-        from webdriver_manager.microsoft import IEDriverManager
+        
         driver_path = IEDriverManager().install()
         driver = webdriver.Ie(service=Service(driver_path), options=options)
 

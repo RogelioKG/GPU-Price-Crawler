@@ -1,5 +1,4 @@
 # standard library
-from pathlib import Path
 import random
 import time
 
@@ -13,17 +12,14 @@ from selenium.common.exceptions import NoSuchElementException  # Exception 找�
 from tqdm import tqdm
 
 # local library
-from constants import (
-    PCHOME_URL,
-    HEIGHT,
-    NEXT_BLOCKS,
-    EXPECTED_BLOCKS,
-    SCRIPT_DIR,
-    SLEEP,
-)
-from init_webdriver import *
-from crawling_functions import *
-from accessor import *
+from parameters.variables import NEXT_BLOCKS, EXPECTED_BLOCKS, SLEEP
+from parameters.constants import PCHOME_URL, HEIGHT, SCRIPT_DIR
+from elements.accessor import *
+from elements.gpu import GPU
+from services.crawling_functions import *
+from elements.exception import CrawlingError
+from services.init_webdriver import *
+
 
 # 收集到的資料
 results = []
@@ -53,7 +49,7 @@ if __name__ == "__main__":
     options = Options()
     set_options(options)
 
-    # 創建 Driver 實例
+    # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行會失敗)
     driver = get_driver("Chrome", options=options)
     driver.get(PCHOME_URL)
 
@@ -66,9 +62,9 @@ if __name__ == "__main__":
             EC.presence_of_element_located((By.CLASS_NAME, "col3f"))
         )
     except Exception:
-        print_error("main program", "Cannot find the element.")
-        driver.quit()
-        exit()
+        raise CrawlingError(
+            "main program", 'Cannot find the element with class="col3f".'
+        )
     with tqdm(total=EXPECTED_BLOCKS, colour="green", unit=" records") as pbar:
         while True:
             if len(results) >= EXPECTED_BLOCKS:
@@ -93,11 +89,9 @@ if __name__ == "__main__":
                     else:
                         deal_with_block(block, pbar)
             except IndexError:
-                print_error("main program", "blocks are empty.")
-                break
+                raise CrawlingError("main program", "blocks are empty.")
             except NoSuchElementException:
-                print_error("main program", "找不到下個頭筆資料")
-                break
+                raise CrawlingError("main program", "找不到下個頭筆資料")
             # 休息
             time.sleep(random.uniform(1, 3) * SLEEP)
     print(
@@ -106,8 +100,6 @@ if __name__ == "__main__":
 
     driver.close()
     driver.quit()
-
-    # 爬到五個不符合標準的就停下來
 
     file = Csv(SCRIPT_DIR / "results.csv")
     file.writerow(("title", "description", "value"), mode="at")
