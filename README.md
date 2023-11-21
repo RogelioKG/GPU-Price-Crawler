@@ -8,7 +8,7 @@
 
 腳本在 *main.py*，直接執行即可。結果會直接產出在頂層目錄。
 
-*test_entry* 與 *tests* 僅作為單元測試之用途。
+*test_entry.py* 與 *tests* 僅作為單元測試之用途。
 
 ## Murmuring
 
