@@ -1,9 +1,8 @@
 # standard library
+import csv
 from pathlib import Path
 from typing import Iterable, Any
 
-# third party library
-import csv
 
 
 class CSV():
