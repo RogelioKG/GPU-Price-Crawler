@@ -6,7 +6,14 @@ from typing import Iterable, Any
 
 
 class CSV():
+    """CSV 讀寫簡易介面
+    """
     def __init__(self, filepath: Path):
+        """
+        Parameters
+        ----------
+        filepath (Path) : 檔案路徑 
+        """
         self.filepath = filepath
         
     def read(self) -> list[tuple[str]]:

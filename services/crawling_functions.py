@@ -19,16 +19,18 @@ def fetch_info(block: WebElement) -> tuple[str, str, int] | bool:
             - desc (str) : 敘述
             - price (int) : 價格
         - 2. 找不到符合特定元素的資料，回傳 False
-    """
-    try:
-        title_element = block.find_element(By.CLASS_NAME, "prod_name")
-        title = title_element.text
-        desc_element = block.find_element(By.CLASS_NAME, "nick")
-        desc = desc_element.text
-        price_element = block.find_element(By.CLASS_NAME, "value")
-        price = int(price_element.text)
 
-    except NoSuchElementException:
-        return False
+    Exceptions
+    ----------
+    + `NoSuchElementException` : 
+        若是無法抓到的資料，引發該錯誤。
+    """
+
+    title_element = block.find_element(By.CLASS_NAME, "prod_name")
+    title = title_element.text
+    desc_element = block.find_element(By.CLASS_NAME, "nick")
+    desc = desc_element.text
+    price_element = block.find_element(By.CLASS_NAME, "value")
+    price = int(price_element.text)
 
     return title, desc, price

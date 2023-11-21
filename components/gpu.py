@@ -50,11 +50,15 @@ class GPU:
         ----------
         + `text`  (str) : 文字
         + `price` (int) : 價格
+
         Returns
         -------
-        + (GPU | bool) :
-            + (GPU)  : GPU 資訊
-            + (bool) : False，表示建立失敗
+        + (GPU) : GPU 資訊
+        
+        Exceptions
+        ----------
+        + `GPUInitError` :
+            若非目標顯卡，或者格式不正確，引發該錯誤。例如 "GTX1660S"。
         """
 
         if "+" in text:

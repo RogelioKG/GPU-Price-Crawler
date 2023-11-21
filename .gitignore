@@ -6,3 +6,4 @@ Scripts/
 # file
 *.pyc
 pyvenv.cfg
+tests/test_results.csv
