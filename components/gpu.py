@@ -1,4 +1,5 @@
 # standard library
+import inspect
 import re
 
 # local library
@@ -25,9 +26,9 @@ class GPU:
         ----------
         + `mfr`    (MFR)        : 製造商
         + `oem`    (OEM | None) : 如果沒有 OEM，就表示是公版卡
-        + `prefix` (str)        : 例如 -- RTX 3060 Ti 的 prefix 為 RTX
-        + `name`   (str)        : 例如 -- RTX 3060 Ti 的 name 為 3060
-        + `suffix` (str | None) : 例如 -- RTX 3060 Ti 的 suffix 為 Ti
+        + `prefix` (str)        : 例如 "RTX 3060 Ti" 的 prefix 為 RTX
+        + `name`   (str)        : 例如 "RTX 3060 Ti" 的 name 為 3060
+        + `suffix` (str | None) : 例如 "RTX 3060 Ti" 的 suffix 為 Ti
         + `vram`   (int | None) : 單位 GB
         + `gddr`   (int | None) : GDDR
         + `price`  (int)        : 新台幣 (NT Dollars)
@@ -60,9 +61,6 @@ class GPU:
             raise GPUInitError("綑綁銷售，夾帶私貨")
         if "DIY" in text:
             raise GPUInitError("套裝機")
-        
-        # 原本寫了一些邪魔歪道的一行寫法，後來發現先建表再查，最快！
-
 
         # 先轉大寫
         text = text.upper()
@@ -134,6 +132,20 @@ class GPU:
             gddr = int(gddr.group(1))
 
         return cls(mfr, oem, prefix, name, suffix, vram, gddr, price)
+
+    @classmethod
+    def getattrs(cls) -> tuple[str]:
+        """獲得這個類別實例的所有屬性
+
+        Parameters
+        ----------
+        ...
+
+        Returns
+        -------
+        (tuple[str]) : instance attributes
+        """
+        return tuple(attr for attr in inspect.signature(cls.__init__).parameters.keys() if attr != 'self')
 
     def __str__(self):
         return "\n".join(

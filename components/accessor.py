@@ -6,7 +6,7 @@ from typing import Iterable, Any
 import csv
 
 
-class Csv():
+class CSV():
     def __init__(self, filepath: Path):
         self.filepath = filepath
         
