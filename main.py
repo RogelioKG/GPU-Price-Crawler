@@ -71,7 +71,7 @@ def try_converting_to_record(block: WebElement, pbar: tqdm) -> None:
 
 
 def can_stop_crawling() -> bool:
-    """(已經抓到需要數量筆的資料) or (錯誤資料累積量 > 10)，停止爬蟲
+    """(已經抓到需要數量筆的資料) or (錯誤資料累積量 > 20)，停止爬蟲
     
     Returns
     -------
@@ -80,7 +80,7 @@ def can_stop_crawling() -> bool:
     global total_correct_records
     global wrong_records_counter
 
-    return (total_correct_records >= EXPECTED_RECORDS) or (wrong_records_counter > 10)
+    return (total_correct_records >= EXPECTED_RECORDS) or (wrong_records_counter > 20)
 
 
 if __name__ == "__main__":

@@ -1,9 +1,7 @@
 # directory
 __pycache__/
-Lib/
-Scripts/
+.venv/
 
 # file
 *.pyc
-pyvenv.cfg
 tests/test_results.csv

@@ -57,9 +57,9 @@ def set_options(options: Options) -> Options:
     """
     # 禁止錯誤日誌輸出到 console
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    # INFO = 0 / WARNING = 1 / LOG_ERROR = 2 / LOG_FATAL = 3 (default is 0)
-    options.add_argument("log-level=3")
-    # 後臺運行
+    # 無痕模式
+    options.add_argument("--incognito")
+    # 後臺運行 (不提供可視化頁面)
     options.add_argument("--headless")
     # 關閉 GPU 避免某些系統或是網頁出錯
     options.add_argument("--disable-gpu")
