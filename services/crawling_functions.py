@@ -20,7 +20,7 @@ def fetch_info(block: WebElement) -> tuple[str, str, int]:
 
     Exceptions
     ----------
-    + `NoSuchElementException` : 
+    + `NoSuchElementException` :
         若是無法抓到的資料，引發該錯誤。
     """
 

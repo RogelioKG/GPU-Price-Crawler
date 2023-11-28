@@ -22,22 +22,18 @@ def get_driver(browser: str, options: Options = Options()):
     + `driver` (WebDriver) : WebDriver 實例
     """
     if browser == "Chrome":
-        
         driver_path = ChromeDriverManager().install()
         driver = webdriver.Chrome(service=Service(driver_path), options=options)
 
     elif browser == "Edge":
-        
         driver_path = EdgeChromiumDriverManager().install()
         driver = webdriver.Edge(service=Service(driver_path), options=options)
 
     elif browser == "Firefox":
-        
         driver_path = GeckoDriverManager().install()
         driver = webdriver.Firefox(service=Service(driver_path), options=options)
 
     elif browser == "IE":
-        
         driver_path = IEDriverManager().install()
         driver = webdriver.Ie(service=Service(driver_path), options=options)
 
@@ -67,7 +63,7 @@ def set_options(options: Options) -> Options:
     options.add_argument("--disable-notifications")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     url = "https://pypi.org/project/webdriver-manager/"
     driver = get_driver(browser="Chrome")
     driver.get(url)

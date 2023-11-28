@@ -54,7 +54,7 @@ class GPU:
         Returns
         -------
         + (GPU) : GPU 資訊
-        
+
         Exceptions
         ----------
         + `GPUInitError` :
@@ -71,7 +71,7 @@ class GPU:
 
         # 嘗試找出製造商，要不然先設為 None
         for m in MFR_TABLE:
-            if (m.name.upper() in text or m.value in text):
+            if m.name.upper() in text or m.value in text:
                 mfr = m.name
                 break
         else:
@@ -79,7 +79,7 @@ class GPU:
 
         # 嘗試找出OEM，要不然設為 None
         for o in OEM_TABLE:
-            if (o.name.upper() in text or o.value in text):
+            if o.name.upper() in text or o.value in text:
                 oem = o.value
                 break
         else:
@@ -149,7 +149,11 @@ class GPU:
         -------
         (tuple[str]) : instance attributes
         """
-        return tuple(attr for attr in inspect.signature(cls.__init__).parameters.keys() if attr != 'self')
+        return tuple(
+            attr
+            for attr in inspect.signature(cls.__init__).parameters.keys()
+            if attr != "self"
+        )
 
     def __str__(self):
         return "\n".join(

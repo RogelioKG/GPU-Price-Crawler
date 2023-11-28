@@ -5,10 +5,10 @@ class CrawlingError(Exception):
         Parameters
         ----------
         + `location` (str) : 發生位置
-        + `message` (str) : 錯誤訊息 
-        """  
+        + `message` (str) : 錯誤訊息
+        """
         err = f"Error in {location}: {message}"
-        super().__init__("\n" + "\n".join(["*"*len(err), err, "*"*len(err)]))
+        super().__init__("\n" + "\n".join(["*" * len(err), err, "*" * len(err)]))
 
 
 class GPUInitError(CrawlingError):
@@ -17,6 +17,6 @@ class GPUInitError(CrawlingError):
 
         Parameters
         ----------
-        + `message` (str) : 錯誤訊息 
-        """  
+        + `message` (str) : 錯誤訊息
+        """
         super().__init__("GPU", message)

@@ -9,7 +9,7 @@ from selenium.webdriver.remote.webelement import WebElement  # 網頁元素，fi
 from selenium.webdriver.support.ui import WebDriverWait  # 掛機
 from selenium.webdriver.support import expected_conditions as EC  # 預期元素
 from selenium.common.exceptions import NoSuchElementException  # 找不到元素 Exception
-from tqdm import tqdm # 進度條 (酷)
+from tqdm import tqdm  # 進度條 (酷)
 
 # local library
 from components.accessor import CSV
@@ -67,12 +67,14 @@ def try_converting_to_record(block: WebElement, pbar: tqdm) -> None:
                 # 抓到但不正確的資料
                 wrong_records_counter += 1
 
-        pbar.set_description(f"已獲得: {total_correct_records} 不可用: {wrong_records_counter} ")
+        pbar.set_description(
+            f"已獲得: {total_correct_records} 不可用: {wrong_records_counter} "
+        )
 
 
 def can_stop_crawling() -> bool:
     """(已經抓到需要數量筆的資料) or (錯誤資料累積量 > 20)，停止爬蟲
-    
+
     Returns
     -------
     (bool) : 是否要停止爬蟲
@@ -84,7 +86,6 @@ def can_stop_crawling() -> bool:
 
 
 if __name__ == "__main__":
-
     # 設定 Options
     options = Options()
     set_options(options)
@@ -92,7 +93,7 @@ if __name__ == "__main__":
     # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行會失敗)
     driver = get_driver("Chrome", options=options)
     driver.get(PCHOME_URL)
-    
+
     # csv 檔案路徑
     file = CSV(SCRIPT_DIR / "results.csv")
 
@@ -128,7 +129,9 @@ if __name__ == "__main__":
                     By.XPATH, "following-sibling::*[1]"
                 )
             except NoSuchElementException:
-                raise CrawlingError("main program", "Cannot find the next beginning block.")
+                raise CrawlingError(
+                    "main program", "Cannot find the next beginning block."
+                )
             except IndexError:
                 raise CrawlingError("main program", "Blocks are empty.")
             else:
