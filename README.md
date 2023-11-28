@@ -14,7 +14,7 @@
 
 + 嘗試使用 EAFP 的設計風格 (Easier to Ask Forgiveness Than Permission，請求寬恕比請求許可更容易)
 
-## Execute
+## Run Script
 
 ```bash
 py main.py
