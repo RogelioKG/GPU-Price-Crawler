@@ -1,4 +1,4 @@
-# GPU-Crawler
+# GPU-Price-Crawler
 
 ## Brief
 
