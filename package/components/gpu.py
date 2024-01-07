@@ -51,8 +51,8 @@ class GPU:
         self.gddr = gddr
         self.price = price
 
-    @classmethod
-    def parse(cls, text: str, price: int) -> "GPU":
+    @staticmethod
+    def parse(text: str, price: int) -> "GPU":
         """GPU 的工廠方法，分析文字取得 GPU 資訊
 
         Parameters
@@ -144,7 +144,7 @@ class GPU:
         if gddr is not None:
             gddr = int(gddr.group(1))
 
-        return cls(mfr, oem, prefix, name, suffix, vram, gddr, price)
+        return GPU(mfr, oem, prefix, name, suffix, vram, gddr, price)
 
     @cached_class_property
     def columns(cls) -> tuple[str]:
