@@ -1,5 +1,5 @@
-from parameters.constants import MFR_INFO
-from components.company import MFR
+from package.parameters.constants import MFR_INFO
+from package.components.company import MFR
 
 def main() -> None:
     print(MFR_INFO[MFR.NVIDIA.name]["GTX"])

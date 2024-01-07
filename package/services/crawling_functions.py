@@ -1,7 +1,6 @@
 # standard library
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.common.exceptions import NoSuchElementException
 
 
 def fetch_info(block: WebElement) -> tuple[str, str, int]:

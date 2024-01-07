@@ -12,13 +12,13 @@ from selenium.common.exceptions import NoSuchElementException  # 找不到元素
 from tqdm import tqdm  # 進度條 (酷)
 
 # local library
-from components.accessor import CSV
-from components.exception import CrawlingError, GPUInitError
-from components.gpu import GPU
-from parameters.variables import NEXT_BLOCKS, EXPECTED_RECORDS, SLEEP
-from parameters.constants import PCHOME_URL, HEIGHT, SCRIPT_DIR
-from services.crawling_functions import fetch_info
-from services.init_webdriver import get_driver, set_options
+from package.components.accessor import CSV
+from package.components.exception import CrawlingError, GPUInitError
+from package.components.gpu import GPU
+from package.parameters.variables import NEXT_BLOCKS, EXPECTED_RECORDS, SLEEP
+from package.parameters.constants import PCHOME_URL, HEIGHT, SCRIPT_DIR
+from package.services.crawling_functions import fetch_info
+from package.services.init_webdriver import get_driver, set_options
 
 
 # 正確資料緩衝區
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         "---------------------------------------------- Web crawling starts -----------------------------------------------"
     )
     # 先寫入欄位名稱
-    file.writerow(GPU.getattrs(), mode="wt")
+    file.writerow(GPU.columns, mode="wt")
     try:
         # 試圖等待第一個頭區塊刷新出來
         beginning_block: WebElement = WebDriverWait(driver, 5).until(

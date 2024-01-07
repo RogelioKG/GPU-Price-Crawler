@@ -1,17 +1,26 @@
 # standard library
 import inspect
 import re
+from functools import cache
 
 # local library
-from .company import MFR, OEM
-from .exception import GPUInitError
-from parameters.constants import MFR_TABLE, OEM_TABLE, PREFIX_TABLE, MFR_INFO
+from package.components.company import MFR, OEM
+from package.components.exception import GPUInitError
+from package.parameters.constants import MFR_TABLE, OEM_TABLE, PREFIX_TABLE, MFR_INFO
 
+def cached_class_property(func):
+    """快取類別屬性裝飾器，只要存取一次後就會 cache 起來。
+    """
+    # 這裡之所以不使用 cached_property，是因為我們需要的是類別層級的快取，
+    # 而不是實例層級的快取 (導致每次創建實例都要重新快取一次，有和沒有一樣)。
+    # 請注意，IDE 語法高亮可能會將被裝飾函數誤認成方法 (classmethod) 上色，
+    # 實際上要將其當成屬性存取 (property)。
+    return classmethod(property(cache(func)))
 
 class GPU:
     def __init__(
         self,
-        mfr: MFR,
+        manufacturer: MFR,
         oem: OEM | None,
         prefix: str,
         name: str,
@@ -24,16 +33,16 @@ class GPU:
 
         Parameters
         ----------
-        + `mfr`    (MFR)        : 製造商
-        + `oem`    (OEM | None) : 如果沒有 OEM，就表示是公版卡
-        + `prefix` (str)        : 例如 "RTX 3060 Ti" 的 prefix 為 RTX
-        + `name`   (str)        : 例如 "RTX 3060 Ti" 的 name 為 3060
-        + `suffix` (str | None) : 例如 "RTX 3060 Ti" 的 suffix 為 Ti
-        + `vram`   (int | None) : 單位 GB
-        + `gddr`   (int | None) : GDDR
-        + `price`  (int)        : 新台幣 (NT Dollars)
+        + `manufacturer`    (MFR)        : 製造商
+        + `oem`             (OEM | None) : 如果沒有 OEM，就表示是公版卡
+        + `prefix`          (str)        : 例如 "RTX 3060 Ti" 的 prefix 為 RTX
+        + `name`            (str)        : 例如 "RTX 3060 Ti" 的 name 為 3060
+        + `suffix`          (str | None) : 例如 "RTX 3060 Ti" 的 suffix 為 Ti
+        + `vram`            (int | None) : 單位 GB
+        + `gddr`            (int | None) : GDDR
+        + `price`           (int)        : 新台幣 (NT Dollars)
         """
-        self.manufacturer = mfr
+        self.manufacturer = manufacturer
         self.oem = oem
         self.prefix = prefix
         self.name = name
@@ -137,13 +146,9 @@ class GPU:
 
         return cls(mfr, oem, prefix, name, suffix, vram, gddr, price)
 
-    @classmethod
-    def getattrs(cls) -> tuple[str]:
-        """獲得這個類別實例的所有屬性
-
-        Parameters
-        ----------
-        ...
+    @cached_class_property
+    def columns(cls) -> tuple[str]:
+        """獲取所有實例的屬性
 
         Returns
         -------
@@ -151,9 +156,12 @@ class GPU:
         """
         return tuple(
             attr
-            for attr in inspect.signature(cls.__init__).parameters.keys()
+            for attr in inspect.signature(cls).parameters.keys()
             if attr != "self"
         )
+        
+    def jsonify(self):
+        return {column: getattr(self, column) for column in GPU.columns}
 
     def __str__(self):
         return "\n".join(

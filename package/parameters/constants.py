@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 
 # local library
-from components.company import MFR, OEM
+from package.components.company import MFR, OEM
 
 
 # PChome 顯卡
