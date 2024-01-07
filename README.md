@@ -1,5 +1,7 @@
 # GPU-Price-Crawler
 
+![crawler-short](package/tests/crawler-short.gif)
+
 ## Brief
 
 小作業，PChome 爬蟲，爬下顯卡製造商、OEM、價格等等的資訊，並整理成 CSV 格式表格。
@@ -20,4 +22,3 @@
 py main.py
 ```
 
-![crawler-short](tests/crawler-short.gif)
