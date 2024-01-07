@@ -13,11 +13,12 @@ def cached_class_property(func):
     """
     # 這裡之所以不使用 cached_property，是因為我們需要的是類別層級的快取，
     # 而不是實例層級的快取 (導致每次創建實例都要重新快取一次，有和沒有一樣)。
-    # 請注意，IDE 語法高亮可能會將被裝飾函數誤認成方法 (classmethod) 上色，
-    # 實際上要將其當成屬性存取 (property)。
     return classmethod(property(cache(func)))
 
 class GPU:
+
+    columns: tuple[str]
+
     def __init__(
         self,
         manufacturer: MFR,
@@ -148,7 +149,7 @@ class GPU:
 
     @cached_class_property
     def columns(cls) -> tuple[str]:
-        """獲取所有實例的屬性
+        """獲取實例所有的屬性
 
         Returns
         -------
@@ -161,7 +162,7 @@ class GPU:
         )
         
     def jsonify(self):
-        return {column: getattr(self, column) for column in GPU.columns}
+        return vars(self)
 
     def __str__(self):
         return "\n".join(
