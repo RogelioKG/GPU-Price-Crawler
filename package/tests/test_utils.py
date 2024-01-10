@@ -1,4 +1,8 @@
+# standard library
+from pathlib import Path
+
 # local library
+from package.components.utils import CSV
 from package.components.gpu import GPU
 
 def main() -> None:
@@ -9,6 +13,7 @@ def main() -> None:
         "https://24h.pchome.com.tw/prod/DRADLA-A900GJ7G3"
     )
     gpu = GPU.parse(title + desc, int(price), link)
-    print(gpu)
-    print(GPU.columns)
-    print(gpu.jsonify())
+    file = CSV(Path(__file__).parent / "results.csv")
+    file.writerow(gpu.jsonify().keys(), "at")
+    file.writerow(gpu.jsonify().values(), "at")
+    file.writerow(gpu.jsonify().values(), "at")

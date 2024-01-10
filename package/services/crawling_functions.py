@@ -1,9 +1,9 @@
-# standard library
+# third party library
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
 
-def fetch_info(block: WebElement) -> tuple[str, str, int]:
+def fetch_info(block: WebElement) -> tuple[str, str, int, str]:
     """從一筆資料中抓取標題、敘述與價格
 
     Parameters
@@ -16,6 +16,7 @@ def fetch_info(block: WebElement) -> tuple[str, str, int]:
         - title (str) : 標題
         -  desc (str) : 敘述
         - price (int) : 價格
+        -  link (str) : 連結
 
     Exceptions
     ----------
@@ -29,5 +30,6 @@ def fetch_info(block: WebElement) -> tuple[str, str, int]:
     desc = desc_element.text
     price_element = block.find_element(By.CLASS_NAME, "value")
     price = int(price_element.text)
+    link = title_element.find_element(By.TAG_NAME, "a").get_attribute("href")
 
-    return title, desc, price
+    return title, desc, price, link

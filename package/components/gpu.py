@@ -1,22 +1,15 @@
 # standard library
 import inspect
 import re
-from functools import cache
 
 # local library
 from package.components.company import MFR, OEM
 from package.components.exception import GPUInitError
-from package.parameters.constants import MFR_TABLE, OEM_TABLE, PREFIX_TABLE, MFR_INFO
-
-def cached_class_property(func):
-    """快取類別屬性裝飾器，只要存取一次後就會 cache 起來。
-    """
-    # 這裡之所以不使用 cached_property，是因為我們需要的是類別層級的快取，
-    # 而不是實例層級的快取 (導致每次創建實例都要重新快取一次，有和沒有一樣)。
-    return classmethod(property(cache(func)))
+from package.parameters.constants import MFR_TABLE, OEM_TABLE, PREFIX_TABLE
+from package.parameters.variables import MFR_INFO
+from package.components.utils import cached_class_property
 
 class GPU:
-
     columns: tuple[str]
 
     def __init__(
@@ -25,10 +18,11 @@ class GPU:
         oem: OEM | None,
         prefix: str,
         name: str,
-        suffix: str | None,
+        suffix: str,
         vram: int | None,
         gddr: int | None,
         price: int,
+        link: str | None
     ):
         """GPU 資訊
 
@@ -38,10 +32,11 @@ class GPU:
         + `oem`             (OEM | None) : 如果沒有 OEM，就表示是公版卡
         + `prefix`          (str)        : 例如 "RTX 3060 Ti" 的 prefix 為 RTX
         + `name`            (str)        : 例如 "RTX 3060 Ti" 的 name 為 3060
-        + `suffix`          (str | None) : 例如 "RTX 3060 Ti" 的 suffix 為 Ti
+        + `suffix`          (str)        : 例如 "RTX 3060 Ti" 的 suffix 為 Ti，沒有後綴則為空字串
         + `vram`            (int | None) : 單位 GB
         + `gddr`            (int | None) : GDDR
         + `price`           (int)        : 新台幣 (NT Dollars)
+        + `link`            (str | None) : 商品連結
         """
         self.manufacturer = manufacturer
         self.oem = oem
@@ -51,9 +46,10 @@ class GPU:
         self.vram = vram
         self.gddr = gddr
         self.price = price
+        self.link = link
 
     @staticmethod
-    def parse(text: str, price: int) -> "GPU":
+    def parse(text: str, price: int, link: str) -> "GPU":
         """GPU 的工廠方法，分析文字取得 GPU 資訊
 
         Parameters
@@ -125,13 +121,13 @@ class GPU:
         # 嘗試找出 suffix
         for s in MFR_INFO[mfr][prefix][name]:
             # 先試試看有沒有辦法找到後綴
-            if s is not None and text.find(s.upper(), n_index) != -1:
+            if s != "" and text.find(s.upper(), n_index) != -1:
                 suffix = s
                 break
         else:
-            if None in MFR_INFO[mfr][prefix][name]:
+            if "" in MFR_INFO[mfr][prefix][name]:
                 # 它沒有後綴
-                suffix = None
+                suffix = ""
             else:
                 # 否則這個顯卡必然有後綴
                 # 如存在 RX 7900 XT / RX 7900 XTX 兩顯卡
@@ -145,7 +141,7 @@ class GPU:
         if gddr is not None:
             gddr = int(gddr.group(1))
 
-        return GPU(mfr, oem, prefix, name, suffix, vram, gddr, price)
+        return GPU(mfr, oem, prefix, name, suffix, vram, gddr, price, link)
 
     @cached_class_property
     def columns(cls) -> tuple[str]:
@@ -156,11 +152,9 @@ class GPU:
         (tuple[str]) : instance attributes
         """
         return tuple(
-            attr
-            for attr in inspect.signature(cls).parameters.keys()
-            if attr != "self"
+            attr for attr in inspect.signature(cls).parameters.keys() if attr != "self"
         )
-        
+
     def jsonify(self):
         return vars(self)
 
@@ -175,5 +169,6 @@ class GPU:
                 f"VRAM         : {self.vram} GB",
                 f"GDDR         : {self.gddr}",
                 f"Price        : ${self.price}",
+                f"Link         : {self.link}",
             ]
         )

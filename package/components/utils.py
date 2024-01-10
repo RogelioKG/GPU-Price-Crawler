@@ -1,8 +1,14 @@
 # standard library
 import csv
+from functools import cache
 from pathlib import Path
 from typing import Iterable, Any
 
+def cached_class_property(func):
+    """快取類別屬性裝飾器，只要存取一次後就會 cache 起來。"""
+    # 這裡之所以不使用 cached_property，是因為我們需要的是類別層級的快取，
+    # 而不是實例層級的快取 (導致每次創建實例都要重新快取一次，有和沒有一樣)。
+    return classmethod(property(cache(func)))
 
 class CSV:
     """CSV 讀寫簡易介面"""

@@ -12,9 +12,9 @@ from selenium.common.exceptions import NoSuchElementException  # 找不到元素
 from tqdm import tqdm  # 進度條 (酷)
 
 # local library
-from package.components.accessor import CSV
-from package.components.exception import CrawlingError, GPUInitError
+from package.components.utils import CSV
 from package.components.gpu import GPU
+from package.components.exception import CrawlingError, GPUInitError
 from package.parameters.variables import NEXT_BLOCKS, EXPECTED_RECORDS, SLEEP
 from package.parameters.constants import PCHOME_URL, HEIGHT, SCRIPT_DIR
 from package.services.crawling_functions import fetch_info
@@ -49,15 +49,14 @@ def try_converting_to_record(block: WebElement, pbar: tqdm) -> None:
     # 忽略滾動監控
     if block.get_attribute("id") != "ScrollNav":
         try:
-            result = fetch_info(block)
+            title, desc, price, link = fetch_info(block)
         except NoSuchElementException:
             # 無法抓到的資料
             wrong_records_counter += 1
         else:
             try:
-                title, desc, price = result
-                gpu = GPU.parse(title + desc, int(price))
-                correct_records_buffer.append(vars(gpu).values())
+                gpu = GPU.parse(title + desc, int(price), link)
+                correct_records_buffer.append(gpu.jsonify().values())
                 pbar.update(1)
                 # 抓到且正確的資料
                 total_correct_records += 1
@@ -86,31 +85,28 @@ def can_stop_crawling() -> bool:
 
 
 if __name__ == "__main__":
+    # csv 檔案路徑
+    file = CSV(SCRIPT_DIR / "results.csv")
+    # 先寫入欄位名稱
+    file.writerow(GPU.columns, mode="wt")
+
     # 設定 Options
     options = Options()
     set_options(options)
 
-    # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行會失敗)
+    # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行有可能會失敗)
     driver = get_driver("Chrome", options=options)
+
+    print("---------------------------------------------- Web crawling starts -----------------------------------------------")
+    # 加載網頁
     driver.get(PCHOME_URL)
-
-    # csv 檔案路徑
-    file = CSV(SCRIPT_DIR / "results.csv")
-
-    print(
-        "---------------------------------------------- Web crawling starts -----------------------------------------------"
-    )
-    # 先寫入欄位名稱
-    file.writerow(GPU.columns, mode="wt")
     try:
         # 試圖等待第一個頭區塊刷新出來
         beginning_block: WebElement = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.CLASS_NAME, "col3f"))
         )
     except Exception:
-        raise CrawlingError(
-            "main program", "Cannot find the element with class='col3f'."
-        )
+        raise CrawlingError("main.py", "Cannot find the element with class='col3f'.")
     with tqdm(total=EXPECTED_RECORDS, colour="green", unit=" records") as pbar:
         while True:
             if can_stop_crawling():
@@ -129,11 +125,9 @@ if __name__ == "__main__":
                     By.XPATH, "following-sibling::*[1]"
                 )
             except NoSuchElementException:
-                raise CrawlingError(
-                    "main program", "Cannot find the next beginning block."
-                )
+                raise CrawlingError("main.py", "Cannot find the next beginning block.")
             except IndexError:
-                raise CrawlingError("main program", "Blocks are empty.")
+                raise CrawlingError("main.py", "Blocks are empty.")
             else:
                 # 處理每個區塊
                 for block in blocks:
@@ -145,9 +139,8 @@ if __name__ == "__main__":
                 file.writerows(correct_records_buffer, mode="at")
                 correct_records_buffer.clear()
                 time.sleep(random.uniform(1, 3) * SLEEP)
-    print(
-        "----------------------------------------------- Web crawling ends ------------------------------------------------"
-    )
-
+    print("----------------------------------------------- Web crawling ends ------------------------------------------------")
+    
+    # Driver 實例關閉
     driver.close()
     driver.quit()

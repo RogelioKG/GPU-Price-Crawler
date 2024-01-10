@@ -22,3 +22,16 @@
 py main.py
 ```
 
+## To-do
++ [ ] CPU 價格爬蟲
++ [ ] 跨網站爬蟲
++ [ ] 異步編程 (async)
++ [ ] 後端資料庫系統
++ [ ] 前端 UI
+
+
+## Note
++ `2024/01/10`
+   + 新增 NVIDIA 顯卡 RTX 4070 Super & RTX 4070 Ti Super & RTX 4080 Super
+   + GPU 新增 link 屬性
+

@@ -19,4 +19,4 @@ class GPUInitError(CrawlingError):
         ----------
         + `message` (str) : 錯誤訊息
         """
-        super().__init__("GPU", message)
+        super().__init__("GPU Initialization", message)
