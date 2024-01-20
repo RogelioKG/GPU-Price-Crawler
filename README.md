@@ -7,15 +7,11 @@ Last Update: 2024/1/20
 
 PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理於 CSV 檔。
 
-可自訂想要爬的顯卡 (*constants.py*)、要抓的目標數量與爬蟲速度 (*variables.py*) 等等。
+可自訂想要爬的顯卡、要抓的目標數量與爬蟲速度 (*variables.py*) 等等。
 
 腳本於 *main.py*。結果會直接產出在頂層目錄。
 
 *test_entry.py* 與 *tests* 僅作為單元測試之用途。
-
-## Murmuring
-
-+ 嘗試使用 EAFP 的設計風格 (Easier to Ask Forgiveness Than Permission，請求寬恕比請求許可更容易)
 
 ## Run Script
 
@@ -36,7 +32,6 @@ PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理�
 + [ ] 異步編程 (async)
 + [ ] 後端資料庫系統
 + [ ] 前端 UI
-
 
 ## Note
 
