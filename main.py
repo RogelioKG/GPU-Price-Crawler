@@ -3,6 +3,7 @@ import random
 import time
 
 # third party library
+import colorama
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webelement import WebElement  # 網頁元素，find 回傳的資料結構
@@ -14,11 +15,12 @@ from tqdm import tqdm  # 進度條 (酷)
 # local library
 from package.components.utils import CSV
 from package.components.gpu import GPU
-from package.components.exception import CrawlingError, GPUInitError
+from package.components.exception import CrawlingError, GPUInfoInitError
 from package.parameters.variables import NEXT_BLOCKS, EXPECTED_RECORDS, SLEEP
 from package.parameters.constants import PCHOME_URL, HEIGHT, SCRIPT_DIR
 from package.services.crawling_functions import fetch_info
 from package.services.init_webdriver import get_driver, set_options
+from package.components.utils import make_hr_message
 
 
 # 正確資料緩衝區
@@ -62,12 +64,12 @@ def try_converting_to_record(block: WebElement, pbar: tqdm) -> None:
                 total_correct_records += 1
                 # 清 0
                 wrong_records_counter = 0
-            except GPUInitError:
+            except GPUInfoInitError:
                 # 抓到但不正確的資料
                 wrong_records_counter += 1
 
         pbar.set_description(
-            f"已獲得: {total_correct_records} 不可用: {wrong_records_counter} "
+            f"已獲得: {total_correct_records} 累積不可用: {wrong_records_counter} "
         )
 
 
@@ -85,6 +87,10 @@ def can_stop_crawling() -> bool:
 
 
 if __name__ == "__main__":
+    
+    # color CLI 初始化
+    colorama.init()
+    
     # csv 檔案路徑
     file = CSV(SCRIPT_DIR / "results.csv")
     # 先寫入欄位名稱
@@ -94,53 +100,64 @@ if __name__ == "__main__":
     options = Options()
     set_options(options)
 
-    # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行有可能會失敗)
-    driver = get_driver("Chrome", options=options)
-
-    print("---------------------------------------------- Web crawling starts -----------------------------------------------")
-    # 加載網頁
-    driver.get(PCHOME_URL)
     try:
-        # 試圖等待第一個頭區塊刷新出來
-        beginning_block: WebElement = WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "col3f"))
-        )
-    except Exception:
-        raise CrawlingError("main.py", "Cannot find the element with class='col3f'.")
-    with tqdm(total=EXPECTED_RECORDS, colour="green", unit=" records") as pbar:
-        while True:
-            if can_stop_crawling():
-                break
-            else:
-                try_converting_to_record(beginning_block, pbar)
-            # 1.5 倍滾動距離，確保觸發 <div id="ScrollNav"></div> 讓資料繼續刷新
-            driver.execute_script(f"window.scrollBy(0, {1.5 * NEXT_BLOCKS * HEIGHT})")
-            try:
-                # 頭區塊後再挖 n 個區塊出來
-                blocks = beginning_block.find_elements(
-                    By.XPATH, f"following-sibling::*[position() <= {NEXT_BLOCKS}]"
-                )
-                # 下個頭區塊
-                beginning_block = blocks[-1].find_element(
-                    By.XPATH, "following-sibling::*[1]"
-                )
-            except NoSuchElementException:
-                raise CrawlingError("main.py", "Cannot find the next beginning block.")
-            except IndexError:
-                raise CrawlingError("main.py", "Blocks are empty.")
-            else:
-                # 處理每個區塊
-                for block in blocks:
-                    if can_stop_crawling():
-                        break
-                    else:
-                        try_converting_to_record(block, pbar)
-                # 將資料寫入並休息
-                file.writerows(correct_records_buffer, mode="at")
-                correct_records_buffer.clear()
-                time.sleep(random.uniform(1, 3) * SLEEP)
-    print("----------------------------------------------- Web crawling ends ------------------------------------------------")
-    
-    # Driver 實例關閉
-    driver.close()
-    driver.quit()
+        # 印出開始訊息
+        message = make_hr_message(" Web crawling starts ", color=colorama.Fore.GREEN)
+        print(message)
+        try:
+            # 創建 Driver 實例 (如果需更新/重新安裝，第一次執行有可能會失敗)
+            driver = get_driver("Chrome", options=options)
+            # 加載網頁
+            driver.get(PCHOME_URL)
+        except Exception:
+            raise CrawlingError("Trying to install / update webdriver... Please run this program again.")
+        try:
+            # 試圖等待第一個頭區塊刷新出來
+            beginning_block: WebElement = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "col3f"))
+            )
+        except Exception:
+            raise CrawlingError("Cannot find the element with class='col3f'.")
+        with tqdm(total=EXPECTED_RECORDS, colour="green", unit=" records") as pbar:
+            while True:
+                if can_stop_crawling():
+                    break
+                else:
+                    try_converting_to_record(beginning_block, pbar)
+                # 1.5 倍滾動距離，確保觸發 <div id="ScrollNav"></div> 讓資料繼續刷新
+                driver.execute_script(f"window.scrollBy(0, {1.5 * NEXT_BLOCKS * HEIGHT})")
+                try:
+                    # 頭區塊後再挖 n 個區塊出來
+                    blocks = beginning_block.find_elements(
+                        By.XPATH, f"following-sibling::*[position() <= {NEXT_BLOCKS}]"
+                    )
+                    # 下個頭區塊
+                    beginning_block = blocks[-1].find_element(
+                        By.XPATH, "following-sibling::*[1]"
+                    )
+                except NoSuchElementException:
+                    raise CrawlingError("Cannot find the next beginning block.")
+                except IndexError:
+                    raise CrawlingError("Blocks are empty.")
+                else:
+                    # 處理每個區塊
+                    for block in blocks:
+                        if can_stop_crawling():
+                            break
+                        else:
+                            try_converting_to_record(block, pbar)
+                    # 將資料寫入並休息
+                    file.writerows(correct_records_buffer, mode="at")
+                    correct_records_buffer.clear()
+                    time.sleep(random.uniform(1, 3) * SLEEP)
+    except CrawlingError as err:
+        print(err)
+        message = make_hr_message(" Web crawling abnormally terminated ", color=colorama.Fore.RED)
+    else:
+        message = make_hr_message(" Web crawling ends ", color=colorama.Fore.GREEN)
+    finally:
+        # Driver 實例關閉
+        driver.close()
+        driver.quit()
+        # 印出結束訊息
+        print(message)

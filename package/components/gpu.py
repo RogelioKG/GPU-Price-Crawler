@@ -4,7 +4,7 @@ import re
 
 # local library
 from package.components.company import MFR, OEM
-from package.components.exception import GPUInitError
+from package.components.exception import GPUInfoInitError
 from package.parameters.constants import MFR_TABLE, OEM_TABLE, PREFIX_TABLE
 from package.parameters.variables import MFR_INFO
 from package.components.utils import cached_class_property
@@ -63,14 +63,14 @@ class GPU:
 
         Exceptions
         ----------
-        + `GPUInitError` :
+        + `GPUInfoInitError` :
             若非目標顯卡，或者格式不正確，引發該錯誤。例如 "GTX1660S"。
         """
 
         if "+" in text:
-            raise GPUInitError("綑綁銷售，夾帶私貨")
+            raise GPUInfoInitError("綑綁銷售，夾帶私貨")
         if "DIY" in text:
-            raise GPUInitError("套裝機")
+            raise GPUInfoInitError("套裝機")
 
         # 先轉大寫
         text = text.upper()
@@ -100,7 +100,7 @@ class GPU:
                 p_index += len(p)
                 break
         else:
-            raise GPUInitError("不可能沒有 prefix")
+            raise GPUInfoInitError("不可能沒有 prefix")
 
         # 如果找不到製造商，利用 prefix 判斷製造商
         if mfr is None:
@@ -116,7 +116,7 @@ class GPU:
                 n_index += len(name)
                 break
         else:
-            raise GPUInitError("不可能沒有 name")
+            raise GPUInfoInitError("不可能沒有 name")
 
         # 嘗試找出 suffix
         for s in MFR_INFO[mfr][prefix][name]:
@@ -132,7 +132,7 @@ class GPU:
                 # 否則這個顯卡必然有後綴
                 # 如存在 RX 7900 XT / RX 7900 XTX 兩顯卡
                 # 但並未存在 RX 7900 這張顯卡
-                raise GPUInitError("不可能沒有 suffix")
+                raise GPUInfoInitError("不可能沒有 suffix")
 
         vram = re.search("(\d+)GB", text)
         if vram is not None:
