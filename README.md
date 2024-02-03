@@ -1,17 +1,18 @@
 # GPU-Price-Crawler
-Last Update: 2024/1/20
+<!-- Badges -->
+![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-blue)
+[![Python 3.11.4](https://img.shields.io/badge/python-3.11.4-blue)](https://www.python.org/downloads/release/python-3114/ "More details about Python 3.11.4")
+![Last Update: 2024/1/20](https://img.shields.io/badge/last%20update-2024/1/20-darkgreen)
+[![Licence](https://img.shields.io/github/license/RogelioKG/GPU-Price-Crawler)](./LICENSE)
 
-![crawler-short](package/tests/crawler-short.gif)
 
 ## Brief
+PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理於 CSV 檔。\
+可自訂想要爬的顯卡、要抓的目標數量與爬蟲速度 (`variables.py`) 等等。\
+腳本於 `main.py`。結果會直接產出在頂層目錄。
+<!-- GIF -->
+![crawler-short](package/tests/crawler-short.gif)
 
-PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理於 CSV 檔。
-
-可自訂想要爬的顯卡、要抓的目標數量與爬蟲速度 (*variables.py*) 等等。
-
-腳本於 *main.py*。結果會直接產出在頂層目錄。
-
-*test_entry.py* 與 *tests* 僅作為單元測試之用途。
 
 ## Run Script
 
@@ -25,6 +26,7 @@ PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理�
    run.bat
    ```
 
+
 ## To-do
 + [ ] pytest / unittest 單元測試 (純練習)
 + [ ] CPU 價格爬蟲
@@ -33,13 +35,14 @@ PChome 爬蟲，爬下顯卡的製造商、OEM、價格等等資訊，並整理�
 + [ ] 後端資料庫系統
 + [ ] 前端 UI
 
+
 ## Note
 
-+ `2024/1/10`
++ `2024/1/10` (v1.0.1)
   + 新增 NVIDIA 顯卡 RTX 4070 Super & RTX 4070 Ti Super & RTX 4080 Super
   + GPU 新增 link 屬性
 
-+ `2024/1/20`
++ `2024/1/20` (v1.1.0)
   + colorama (CLI 色彩文字)
   + 水平分隔線與終端機等寬
   + 例外的重構 (in *exception.py*)
